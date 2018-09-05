@@ -35,44 +35,43 @@ public class Main {
         System.out.println("calculate = " + calculate(1,2,3,4));
 
         //Проверим результат четвертого задания
-        System.out.println("task4 = " + task4(6,9));
+        System.out.println("checkSumFrom10to20 = " + checkSumFrom10to20(6,9));
 
         //Проверим результат пятого задания
         System.out.println("Проверка пятого задания");
-        task5(0);
+        checkPositiveNimbler(0);
 
         //Проверим результат шестого задания
         System.out.println("Проверка пятого задания");
-        task6(-19);
+        checkNegativeNumber(-19);
 
         //Проверим результат седьмого задания
         System.out.println("Проверка седьмого задания");
-        task7("Владимир");
+        printHello("Владимир");
 
         //Проверим результат восьмого задания
         System.out.println("Проверка восьмого задания");
-        task8(2018);
+        checkPrintLeapYear(2018);
     }
 
     //3. Написать метод вычисляющий выражение a * (b + (c / d)) и возвращающий результат,
     //где a, b, c, d – входные параметры этого метода;
-    public static double calculate(int a, int b, int c, int d) {
-        //здеь было бы неплохо поставить либо try либо до вычисления проверить d на 0
-        return a * (b + (c / d));
+    private static double calculate(int a, int b, int c, int d) {
+        if(d!=0) return a * (b + (double)(c / d));
+        throw new java.lang.Error("деление на ноль");
     }
 
     //4. Написать метод, принимающий на вход два числа, и проверяющий что их сумма лежит в
     //пределах от 10 до 20(включительно), если да – вернуть true, в противном случае – false;
-    public static boolean task4(int a, int b) {
+    private static boolean checkSumFrom10to20(int a, int b) {
         int sum = a + b;
-        if(sum >= 10 && sum <= 20) return true;
-        return false;
+        return sum >= 10 && sum <= 20;
     }
 
     //5. Написать метод, которому в качестве параметра передается целое число, метод должен
     //напечатать в консоль положительное ли число передали, или отрицательное; Замечание:
     //ноль считаем положительным числом.
-    public static void task5(int a) {
+    private static void checkPositiveNimbler(int a) {
         if (a >= 0) {
             System.out.println("Число положительное");
         } else {
@@ -82,21 +81,20 @@ public class Main {
 
     //6. Написать метод, которому в качестве параметра передается целое число, метод должен
     //вернуть true, если число отрицательное;
-    public static boolean task6(int a) {
-        if (a < 0) return true;
-        return false;
+    private static boolean checkNegativeNumber(int a) {
+        return a < 0;
     }
 
     //7. Написать метод, которому в качестве параметра передается строка, обозначающая имя,
     //метод должен вывести в консоль сообщение «Привет, указанное_имя!»;
-    public static void task7(String name) {
+    private static void printHello(String name) {
         System.out.println("Привет, " + name + "!");
     }
 
     //8. *Написать метод, который определяет является ли год високосным, и выводит сообщение в
     //консоль. Каждый 4-й год является високосным, кроме каждого 100-го, при этом каждый 400-й –
     //високосный.
-    public static void task8(int year) {
+    private static void checkPrintLeapYear(int year) {
         if(year % 4 == 0 && year % 100 != 0 || year % 400 == 0)
             System.out.println("Год " + year + " является високосным");
         else

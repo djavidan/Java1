@@ -71,6 +71,8 @@ public class ClassLesson2 {
         System.out.println("\r\n7 - задание -3 сдвига");
         shiftOfNumbers(arr6, -3);
 
+        System.out.println("\r\nДополнительное домашнее задание");
+        fillSnake(4, 4);
     }
 
     //6. ** Написать метод, в который передается не пустой одномерный целочисленный массив,
@@ -126,6 +128,51 @@ public class ClassLesson2 {
                 for (int i : arrParam) System.out.print(i + " ");
                 System.out.print("\r\n");
             }
+        }
+    }
+
+
+    // Дополнительное домашнее задание
+    //1 Задать размерность матрицы от 5 до 7
+    //2 Создать матрицу с указанной размерностью
+    //3 Заполнить матрицу по спирали (числа увеличиваются на 1) (число начинается с 1)
+    private static void fillSnake(int row, int col) {
+
+        int[][] array = new int[col][row];
+        int c = 0, d = 0, s = 1;
+
+        while (s + 1 < col * row) {
+
+            //Движемся вправо.
+            while ((d + 1) < row && array[c][d + 1] == 0)
+                array[c][d++] = s++;
+
+            //Движемся вниз.
+            while ((c + 1) < col && array[c + 1][d] == 0 )
+                array[c++][d] = s++;
+
+            //Движемся влево.
+            while (d > 0 && array[c][d - 1] == 0)
+                array[c][d--] = s++;
+
+            //Движемся вверх.
+            while (array[c - 1][d] == 0)
+                array[c--][d] = s++;
+        }
+
+        //Заполним последнию ячейку
+        for (int x = 0; x < col; x++) {
+            for (int y = 0; y < row; y++) {
+                if (array[x][y] == 0) array[x][y] = s;
+            }
+        }
+
+        //Посмотрим что получилось у нас
+        for (int x = 0; x < col; x++) {
+            for (int y = 0; y < row; y++) {
+                System.out.print(array[x][y] + "  ");
+            }
+            System.out.println();
         }
     }
 }

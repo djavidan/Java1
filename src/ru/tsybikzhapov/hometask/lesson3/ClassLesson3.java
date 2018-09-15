@@ -173,7 +173,7 @@ public class ClassLesson3 {
                     answer /= num;
                     break;
                 default:
-                    System.out.println("Неверный оператор: " + arr[i]);
+                    System.out.println("Неверный оператор: " + operation);
                     return;
             }
 

@@ -9,9 +9,12 @@ public class ClassLesson3 {
 
     public static void main(String[] args) {
         //1 задание основного домешнего задания
-        guessNumber();
+      //  guessNumber();
         //2 задание основого домашнего задания
-        guessFruit();
+      //  guessFruit();
+        //дополнительное домашнее задание
+     //   calculator();
+        advancedCalculator();
     }
 
 
@@ -66,11 +69,10 @@ public class ClassLesson3 {
         System.out.println(word);
         //инициализируем сканер
         Scanner scanner = new Scanner(System.in);
-        String answer;
         do {
             //спрашиваем ответ
             System.out.println("Введи свой ответ: (для выхода из игры, просто нажмите Enter)");
-            answer = scanner.nextLine();
+            String answer = scanner.nextLine();
             //если нам надоес играть то мы выйдем
             if (answer.equals("")) break;
             else if (word.equals(answer)) {
@@ -88,7 +90,94 @@ public class ClassLesson3 {
             System.out.println(comment);
         }
         while (true);
-
     }
 
+    //Создать консольный калькулятор
+    //
+    //1 Базовый калькулятор
+    //Введите два числа через пробел, пример
+    //1 + 2
+    //или
+    //2 * 2
+    //
+    //(должно быть доступно 4 операции + - / *)
+    //
+    //при этом если пользователь выбирает какое-либо другое дествие нужно об этом сказать
+    private static void calculator() {
+
+        System.out.println("Введите два номера и операцию с пробелами между ними");
+
+        Scanner scanner = new Scanner(System.in);
+        String calculation = scanner.nextLine();
+
+        String [] arr = calculation.split(" ");
+
+        int answer;
+        int part1 = Integer.parseInt(arr[0]);
+        int part2 = Integer.parseInt(arr[2]);
+
+        String operation = arr[1];
+
+        switch (operation) {
+            case "+":
+                answer = part1 + part2;
+                break;
+            case "-":
+                answer = part1 - part2;
+                break;
+            case "*":
+                answer = part1 * part2;
+                break;
+            case "/":
+                answer = part1 / part2;
+                break;
+            default:
+                System.out.println("Неверный оператор: " + operation);
+                return;
+        }
+        System.out.println("Ответ: " + answer);
+    }
+
+    //2 Продвинутый калькулятор
+    //
+    //Количество элементов не ограничено
+    private static void advancedCalculator() {
+        System.out.println("Введите два номера и операцию с пробелами между ними");
+
+        Scanner scanner = new Scanner(System.in);
+        String calculation = "+ " + scanner.nextLine();
+        double answer = 0, num;
+
+        String [] arr = calculation.split(" ");
+        String operation = "+";
+        for(int i = 0; i < arr.length; i++ ) {
+
+            if(i % 2 == 0) {
+                operation = arr[i];
+                continue;
+            }
+
+            num = Double.parseDouble(arr[i]);
+
+            switch (operation) {
+                case "+":
+                    answer += num;
+                    break;
+                case "-":
+                    answer -= num;
+                    break;
+                case "*":
+                    answer *= num;
+                    break;
+                case "/":
+                    answer /= num;
+                    break;
+                default:
+                    System.out.println("Неверный оператор: " + arr[i]);
+                    return;
+            }
+
+        }
+        System.out.println("Ответ: " + answer);
+    }
 }

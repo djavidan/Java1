@@ -35,6 +35,10 @@ class Person {
         }
     }
 
+    int GetAge() {
+        return age;
+    }
+
     void Show() {
         System.out.println(fio + " " + post + " " +  email + " " + tel + " " + salary + " " + age);
     }
@@ -54,7 +58,7 @@ public class Main {
         persArray[4] = new Person("Ivanov Ivan4", "Engineer4", "ivivan4@mailbox.com", "4892312312", 70000, 70);
 
         for(Person item : persArray) {
-            item.Show();
+            if(item.GetAge() > 40) item.Show();
         }
     }
 }

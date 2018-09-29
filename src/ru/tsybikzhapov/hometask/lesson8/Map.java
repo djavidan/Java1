@@ -4,21 +4,65 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Random;
 
 public class Map extends JPanel {
 
     public static final int MODE_H_V_A = 0;
     public static final int MODE_H_V_H = 1;
+    private static final char PLAYER_DOT = 'X';
+    private static final char AI_DOT = 'O';
+    private static final char EMPTY_DOT = '.';
+    private static Random random = new Random();
 
-    int[][] field;
+    char[][] field;
     int fieldSizeX;
     int fieldSizeY;
     int winLenght;
-
+    boolean gameOver;
+    boolean isWait;
+    int mode;
     int cellHeight;
     int cellWidth;
-
     boolean isInitialized = false;
+    boolean stepPlayer2;
+
+
+    public void playerStep(int y,int x, char cymbol) {
+        setSym(y, x, cymbol);
+    }
+
+    public void aiStep() {
+        //Ищкем выигрышный ход компьютера
+        for (int i = 0; i < fieldSizeY; i++)
+            for (int j = 0; j < fieldSizeX; j++) {
+                if (isCellValid(i, j)) {
+                    setSym(i, j, AI_DOT);
+                    if (checkWin(AI_DOT)) return;
+                    setSym(i, j, EMPTY_DOT);
+                }
+            }
+        //Проверим игрока а нет ли у него будующего выигрошного хода
+        for (int i = 0; i < fieldSizeY; i++)
+            for (int j = 0; j < fieldSizeX; j++) {
+                if (isCellValid(i, j)) {
+                    setSym(i, j, PLAYER_DOT);
+                    if (checkWin(PLAYER_DOT)) {
+                        setSym(i, j, AI_DOT);
+                        return;
+                    }
+                    setSym(i, j, EMPTY_DOT);
+                }
+            }
+        //Если ничего выигышного нет, то делаем как на уроке
+        int x;
+        int y;
+        do {
+            x = random.nextInt(fieldSizeX);
+            y = random.nextInt(fieldSizeY);
+        } while (!isCellValid(y, x));
+        setSym(y, x, AI_DOT);
+    }
 
     Map() {
         setBackground(Color.ORANGE);
@@ -31,10 +75,57 @@ public class Map extends JPanel {
     }
 
     void update(MouseEvent e) {
-        int cellX = e.getX()/cellWidth;
-        int cellY = e.getY()/cellHeight;
-        System.out.println(cellY + " " + cellX);
+        if (!gameOver && !isWait) {
+            int cellX = e.getX()/cellWidth;
+            int cellY = e.getY()/cellHeight;
+            if (mode == 0) modePlayAI(cellY, cellX);
+            else modeTwoPlayer(cellY, cellX);
+        }
+    }
+
+    // Режим двух игроков
+    void modeTwoPlayer(int y, int x) {
+        char cymbal =  stepPlayer2 ? AI_DOT : PLAYER_DOT;
+        playerStep(y,x,cymbal);
         repaint();
+        if (checkWin(cymbal)) {
+            System.out.println(stepPlayer2 ? "Second player WIN!!" : "First player WIN!!");
+            gameOver = true;
+            return;
+        }
+        if (isFuelFull()) {
+            System.out.println("DRAW!");
+            gameOver = true;
+        }
+        stepPlayer2 = !stepPlayer2;
+    }
+
+    // Режим против компьютера
+    void modePlayAI(int y, int x) {
+        playerStep(y,x,PLAYER_DOT);
+        repaint();
+        if (checkWin(PLAYER_DOT)) {
+            System.out.println("PLAYER WIN!");
+            gameOver = true;
+            return;
+        }
+        if (isFuelFull()) {
+            System.out.println("DRAW!");
+            gameOver = true;
+            return;
+        }
+        aiStep();
+        repaint();
+        if (checkWin(AI_DOT)) {
+            System.out.println("SkyNet WIN!");
+            gameOver = true;
+            return;
+        }
+        if (isFuelFull()) {
+            System.out.println("DRAW!");
+            gameOver = true;
+            return;
+        }
     }
 
     @Override
@@ -49,7 +140,9 @@ public class Map extends JPanel {
         this.fieldSizeX = filedSizeX;
         this.fieldSizeY = filedSizeY;
         this.winLenght = winLen;
-        field = new int[filedSizeY][filedSizeX];
+        this.mode = mode;
+        field = new char[filedSizeY][filedSizeX];
+        initFields();
         isInitialized = true;
         repaint();
     }
@@ -60,6 +153,8 @@ public class Map extends JPanel {
         int panelWidth = getWidth();
         int panelHeight = getHeight();
 
+        Graphics2D g2 = (Graphics2D) g;
+        g2.setStroke(new BasicStroke(3));
 
         cellWidth = panelWidth/fieldSizeY;
         cellHeight = panelHeight/fieldSizeX;
@@ -74,6 +169,76 @@ public class Map extends JPanel {
             g.drawLine(x,0,x, panelHeight);
         }
 
+        g.setColor(Color.DARK_GRAY);
+        for (int i = 0; i < fieldSizeY; i++) {
+            for (int j = 0; j < fieldSizeX; j++) {
+                if (field[j][i] != EMPTY_DOT) {
+                    if (field[j][i] == PLAYER_DOT) {
+                        // Рисуем крестик
+                        g.drawLine((i * cellWidth), (j * cellHeight), (i + 1) * cellWidth, (j + 1) * cellHeight);
+                        g.drawLine((i + 1) * cellWidth, (j * cellHeight), (i * cellWidth), (j + 1) * cellHeight);
+                    }
+                    if (field[j][i] == AI_DOT) {
+                        // Рисуем нолик
+                        g.drawOval((i * cellWidth), (j * cellHeight), cellWidth, cellHeight);
+                    }
+                }
+            }
+        }
     }
 
+    private void initFields() {
+        for (int i = 0; i < fieldSizeY; i++) {
+            for (int j = 0; j < fieldSizeX; j++) {
+                field[i][j] = EMPTY_DOT;
+            }
+        }
+    }
+
+    private void setSym(int y, int x, char sym) {
+        field[y][x] = sym;
+    }
+
+    // проверка линии
+    private boolean checkLine(int y, int x, int vy, int vx, char sym) {
+        int wayX = x + (winLenght - 1) * vx;
+        int wayY = y + (winLenght - 1) * vy;
+        if (wayX < 0 || wayY < 0 || wayX > fieldSizeX - 1 || wayY > fieldSizeY - 1) return false;
+        for (int i = 0; i < winLenght; i++) {
+            int itemY = y + i * vy;
+            int itemX = x + i * vx;
+            if (field[itemY][itemX] != sym) return false;
+        }
+        return true;
+    }
+
+    private boolean checkWin(char sym) {
+        for (int i = 0; i < fieldSizeY; i++) {
+            for (int j = 0; j < fieldSizeX; j++) {
+                if (checkLine(i, j, 0, 1,  sym)) return true;   // проверим линию по х
+                if (checkLine(i, j, 1, 1,  sym)) return true;   // проверим по диагонали х у
+                if (checkLine(i, j, 1, 0,  sym)) return true;   // проверим линию по у
+                if (checkLine(i, j, -1, 1, sym)) return true;  // проверим по диагонали х -у
+            }
+        }
+        return false;
+    }
+
+    public  boolean isFuelFull() {
+        for (int i = 0; i < fieldSizeY; i++) {
+            for (int j = 0; j < fieldSizeX; j++) {
+                if (field[i][j] == EMPTY_DOT) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    public  boolean isCellValid(int y, int x) {
+        if (x < 0 || y < 0 || x > fieldSizeX - 1 || y > fieldSizeY - 1) {
+            return false;
+        }
+        return field[y][x] == EMPTY_DOT;
+    }
 }

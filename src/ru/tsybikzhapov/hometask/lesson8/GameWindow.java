@@ -57,9 +57,12 @@ public class GameWindow extends JFrame {
 
     void startNewGame(int mode, int filedSizeX, int filedSizeY, int winLen) {
         field.startNewGame(mode, filedSizeX, filedSizeY, winLen);
+
     }
 
 }
+
+
 
 
 

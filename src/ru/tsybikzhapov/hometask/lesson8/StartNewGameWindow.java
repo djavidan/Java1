@@ -31,6 +31,7 @@ public class StartNewGameWindow extends JFrame {
         this.gameWindow = gameWindow;
         setTitle("new game param!");
         setSize(WIN_WIDTH, WIN_HEIGHT);
+        setLocationRelativeTo ( null );
 
         Rectangle gameWindowBounds = gameWindow.getBounds();
         int posX = (int) (gameWindowBounds.getCenterX() - WIN_WIDTH/2);

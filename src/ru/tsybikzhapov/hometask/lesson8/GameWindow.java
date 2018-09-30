@@ -17,9 +17,11 @@ public class GameWindow extends JFrame {
     private static StartNewGameWindow startNewGameWindow;
 
     public GameWindow() {
+
         setTitle("TicTacToe");
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        setBounds(WIN_POS_X, WIN_POS_Y, WIN_WIDTH, WIN_HEIGHT);
+        setSize(WIN_WIDTH, WIN_HEIGHT);
+        setLocationRelativeTo ( null );
         setResizable(false);
 
         JPanel bottomPanel = new JPanel(new GridLayout(1, 2));
@@ -35,7 +37,6 @@ public class GameWindow extends JFrame {
         btnNewGame.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                //System.out.println("Start new game");
                 startNewGameWindow.setVisible(true);
             }
         });
@@ -52,6 +53,7 @@ public class GameWindow extends JFrame {
 
         add(bottomPanel, BorderLayout.SOUTH);
         setVisible(true);
+
     }
 
 
@@ -62,22 +64,3 @@ public class GameWindow extends JFrame {
 
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-//        Toolkit toolkit = Toolkit.getDefaultToolkit();
-//        Dimension screenSize = toolkit.getScreenSize();
-//        int sH = screenSize.height;
-//        int sW = screenSize.width;
-//
-//        setSize(sH/2, sW/2);

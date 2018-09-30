@@ -13,7 +13,9 @@ public class Map extends JPanel {
     private static final char PLAYER_DOT = 'X';
     private static final char AI_DOT = 'O';
     private static final char EMPTY_DOT = '.';
+    private static final int DELTA_DRAW = 10;
     private static Random random = new Random();
+    private GameOverWindow gameOverWindow;
 
     char[][] field;
     int fieldSizeX;
@@ -27,12 +29,22 @@ public class Map extends JPanel {
     boolean isInitialized = false;
     boolean stepPlayer2;
 
+    Map() {
+        setBackground(Color.ORANGE);
+        addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                update(e);
+            }
+        });
+        gameOverWindow = new GameOverWindow();
+    }
 
-    public void playerStep(int y,int x, char cymbol) {
+    void playerStep(int y,int x, char cymbol) {
         setSym(y, x, cymbol);
     }
 
-    public void aiStep() {
+    void aiStep() {
         //Ищкем выигрышный ход компьютера
         for (int i = 0; i < fieldSizeY; i++)
             for (int j = 0; j < fieldSizeX; j++) {
@@ -64,16 +76,6 @@ public class Map extends JPanel {
         setSym(y, x, AI_DOT);
     }
 
-    Map() {
-        setBackground(Color.ORANGE);
-        addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                update(e);
-            }
-        });
-    }
-
     void update(MouseEvent e) {
         if (!gameOver && !isWait) {
             int cellX = e.getX()/cellWidth;
@@ -89,13 +91,12 @@ public class Map extends JPanel {
         playerStep(y,x,cymbal);
         repaint();
         if (checkWin(cymbal)) {
-            System.out.println(stepPlayer2 ? "Second player WIN!!" : "First player WIN!!");
-            gameOver = true;
+            gameOverWindow.setMessage(stepPlayer2 ? "Second player WIN!!" : "First player WIN!!",this);
             return;
         }
         if (isFuelFull()) {
-            System.out.println("DRAW!");
-            gameOver = true;
+            gameOverWindow.setMessage("DRAW!",this);
+            return;
         }
         stepPlayer2 = !stepPlayer2;
     }
@@ -105,25 +106,23 @@ public class Map extends JPanel {
         playerStep(y,x,PLAYER_DOT);
         repaint();
         if (checkWin(PLAYER_DOT)) {
-            System.out.println("PLAYER WIN!");
-            gameOver = true;
+            gameOverWindow.setMessage("PLAYER WIN!",this);
             return;
         }
         if (isFuelFull()) {
-            System.out.println("DRAW!");
-            gameOver = true;
+            gameOverWindow.setMessage("DRAW!",this);
             return;
         }
+        isWait = true;
         aiStep();
+        isWait = false;
         repaint();
         if (checkWin(AI_DOT)) {
-            System.out.println("SkyNet WIN!");
-            gameOver = true;
+            gameOverWindow.setMessage("SkyNet WIN!",this);
             return;
         }
         if (isFuelFull()) {
-            System.out.println("DRAW!");
-            gameOver = true;
+            gameOverWindow.setMessage("DRAW!",this);
             return;
         }
     }
@@ -136,7 +135,9 @@ public class Map extends JPanel {
 
     void startNewGame(int mode, int filedSizeX, int filedSizeY, int winLen) {
         System.out.println(mode + " " + filedSizeX + " " + winLen);
-
+        gameOver = false;
+        stepPlayer2 = false;
+        isWait = false;
         this.fieldSizeX = filedSizeX;
         this.fieldSizeY = filedSizeY;
         this.winLenght = winLen;
@@ -175,12 +176,12 @@ public class Map extends JPanel {
                 if (field[j][i] != EMPTY_DOT) {
                     if (field[j][i] == PLAYER_DOT) {
                         // Рисуем крестик
-                        g.drawLine((i * cellWidth), (j * cellHeight), (i + 1) * cellWidth, (j + 1) * cellHeight);
-                        g.drawLine((i + 1) * cellWidth, (j * cellHeight), (i * cellWidth), (j + 1) * cellHeight);
+                        g.drawLine((i * cellWidth) + DELTA_DRAW, (j * cellHeight)+ DELTA_DRAW, (i + 1) * cellWidth - DELTA_DRAW, (j + 1) * cellHeight - DELTA_DRAW);
+                        g.drawLine((i + 1) * cellWidth - DELTA_DRAW, (j * cellHeight) + DELTA_DRAW , (i * cellWidth) + DELTA_DRAW, (j + 1) * cellHeight - DELTA_DRAW);
                     }
                     if (field[j][i] == AI_DOT) {
                         // Рисуем нолик
-                        g.drawOval((i * cellWidth), (j * cellHeight), cellWidth, cellHeight);
+                        g.drawOval((i * cellWidth) + DELTA_DRAW, (j * cellHeight) + DELTA_DRAW, cellWidth - DELTA_DRAW * 2, cellHeight - DELTA_DRAW * 2);
                     }
                 }
             }
@@ -224,7 +225,7 @@ public class Map extends JPanel {
         return false;
     }
 
-    public  boolean isFuelFull() {
+    boolean isFuelFull() {
         for (int i = 0; i < fieldSizeY; i++) {
             for (int j = 0; j < fieldSizeX; j++) {
                 if (field[i][j] == EMPTY_DOT) {
@@ -235,7 +236,7 @@ public class Map extends JPanel {
         return true;
     }
 
-    public  boolean isCellValid(int y, int x) {
+    boolean isCellValid(int y, int x) {
         if (x < 0 || y < 0 || x > fieldSizeX - 1 || y > fieldSizeY - 1) {
             return false;
         }
